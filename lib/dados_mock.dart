@@ -1,0 +1,13 @@
+List<Map<String, String>> usuarios = [
+  {
+    'nome': 'Admin',
+    'email': 'admin@gmail.com',
+    'senha': '1234'
+  },
+  {
+    'nome': 'Usuário',
+    'email': 'usuario@gmail.com',
+    'senha': '1234'
+  }
+
+];
