@@ -3,7 +3,7 @@ import '../dados_mock.dart';
 import 'home_page.dart';
 import 'cadastro_page.dart';
 
-class LoginPage extends StatefulWidget{
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
@@ -11,75 +11,69 @@ class LoginPage extends StatefulWidget{
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController senhaController = TextEditingController();
 
   bool esconderSenha = true;
-  
-  void mostrarMensagem(String mensagem){
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensagem),
-      )
-    );
+
+  void mostrarMensagem(String mensagem) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(mensagem)));
   }
-  
-  void entrar(){
+
+  void entrar() {
     String email = emailController.text.trim();
     String senha = senhaController.text;
 
-    if(email.isEmpty || senha.isEmpty){
+    if (email.isEmpty || senha.isEmpty) {
       mostrarMensagem('Preencha todos os campos');
       return;
     }
 
     Map<String, String>? usuarioEncontrado;
 
-    for(var usuario in usuarios){
-      if (
-        usuario['email'] == email && 
-        usuario['senha'] == senha){
-          usuarioEncontrado = usuario;
-          break;
+    for (var usuario in usuarios) {
+      if (usuario['email'] == email && usuario['senha'] == senha) {
+        usuarioEncontrado = usuario;
+        break;
       }
     }
-      if(usuarioEncontrado == null){
-        mostrarMensagem('E-mail ou senha incorretos');
-      } else {
-        mostrarMensagem('Bem-vindo, ${usuarioEncontrado['nome']}');
-      }
 
-      String nome = usuarioEncontrado?['nome'] ?? 'Usuário';
+    if (usuarioEncontrado == null) {
+      mostrarMensagem('E-mail ou senha incorretos');
+      return;
+    }
 
-      Navigator.pushReplacement(
-        context,
-         MaterialPageRoute(
-          builder: (context) => HomePage(
-            nomeUsuario: nome,
-            emailUsuario: email
-          ),
-          ),
-      );
-  }
+    String nome = usuarioEncontrado?['nome'] ?? 'Usuário';
 
-  void abrirCadastro(){
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => const CadastroPage(),
+        builder: (context) => HomePage(nomeUsuario: nome, emailUsuario: email),
       ),
     );
   }
-  
+
+  void abrirCadastro() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CadastroPage()),
+    );
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    senhaController.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Login'), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -87,39 +81,30 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             const SizedBox(height: 40),
 
-            const Icon(
-              Icons.account_circle,
-              size: 100,
-            ),
+            const Icon(Icons.account_circle, size: 100),
 
             const SizedBox(height: 20),
 
             const Text(
               'Bem-vindo',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold
-              ),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 5),
 
-            const Text(
-              'Entre com sua conta',
-              textAlign: TextAlign.center,
-            ),
+            const Text('Entre com sua conta', textAlign: TextAlign.center),
 
             const SizedBox(height: 30),
 
             TextField(
               controller: emailController,
               keyboardType: TextInputType.emailAddress,
-              decoration:  InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'E-mail',
                 hintText: 'Digite seu e-mail',
                 prefixIcon: Icon(Icons.email),
-                border: OutlineInputBorder()
+                border: OutlineInputBorder(),
               ),
             ),
 
@@ -133,16 +118,16 @@ class _LoginPageState extends State<LoginPage> {
                 hintText: 'Digite sua senha',
                 prefixIcon: const Icon(Icons.lock),
                 border: const OutlineInputBorder(),
-                
+
                 suffixIcon: IconButton(
-                  onPressed: (){
+                  onPressed: () {
                     setState(() {
                       esconderSenha = !esconderSenha;
                     });
                   },
                   icon: Icon(
-                    esconderSenha ? Icons.visibility : Icons.visibility_off
-                  ), 
+                    esconderSenha ? Icons.visibility : Icons.visibility_off,
+                  ),
                 ),
               ),
             ),
@@ -163,9 +148,8 @@ class _LoginPageState extends State<LoginPage> {
               label: const Text('Cadastrar'),
             ),
           ],
-          
         ),
-        )
-      );
+      ),
+    );
   }
 }
