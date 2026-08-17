@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sistemaloginflutter/services/api_service.dart';
 import '../dados_mock.dart';
 import 'home_page.dart';
 import 'cadastro_page.dart';
@@ -15,44 +16,64 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController senhaController = TextEditingController();
 
   bool esconderSenha = true;
+  bool carregando = true;
 
-  void mostrarMensagem(String mensagem) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(mensagem)));
+  void mostrarMensagem(String mensagem){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensagem),
+      )
+    );
   }
 
-  void entrar() {
+   Future<void> entrar() async{
     String email = emailController.text.trim();
     String senha = senhaController.text;
 
-    if (email.isEmpty || senha.isEmpty) {
+    if(email.isEmpty || senha.isEmpty){
       mostrarMensagem('Preencha todos os campos');
       return;
     }
 
     Map<String, String>? usuarioEncontrado;
 
-    for (var usuario in usuarios) {
-      if (usuario['email'] == email && usuario['senha'] == senha) {
-        usuarioEncontrado = usuario;
-        break;
-      }
-    }
+    // for(var usuario in usuarios){
+    //   if (
+    //     usuario['email'] == email && 
+    //     usuario['senha'] == senha){
+    //       break;
+    //   }
+    // }
 
-    if (usuarioEncontrado == null) {
-      mostrarMensagem('E-mail ou senha incorretos');
-      return;
-    }
+    final resultado = await ApiService.login(
+      email: email,
+      senha: senha
+    );
 
-    String nome = usuarioEncontrado?['nome'] ?? 'Usuário';
+    if(resultado['sucesso'] == true){
+      final dados = resultado['dados'];
+      final usuario = dados[usuarios];
+
+      String nome = usuario['nome']?? "Usuario";
+      String emailUsuario = usuario['email'] ?? email;
 
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => HomePage(nomeUsuario: nome, emailUsuario: email),
+        builder: (context) => HomePage(
+          nomeUsuario: nome,
+          emailUsuario: email,
+        ),
       ),
     );
+    }
+
+    // if(usuarioEncontrado == null){
+    //   mostrarMensagem('E-mail ou senha incorretos');
+    //   return;
+    // } 
+
+    
   }
 
   void abrirCadastro() {
@@ -136,7 +157,7 @@ class _LoginPageState extends State<LoginPage> {
 
             ElevatedButton.icon(
               onPressed: entrar,
-              icon: Icon(Icons.login),
+              icon: carregando ? const CircularProgressIndicator() :const Icon(Icons.login),
               label: const Text('Entrar'),
             ),
 
